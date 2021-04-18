@@ -1,9 +1,14 @@
-const io = require("./../services/socket");
+let variables = require("./../global/variables");
 
-//recebe o nome do usuário e os pontos
-socket.on("sendUser", (data) => {
-  const user = createUser(data.name, socket.id);
-  userStatus = true;
-  io.to(socket.id).emit("user_status", { status: true });
-  io.to(socket.id).emit("user", user);
-});
+/** Cria um novo usuario */
+function createUser(data, id) {
+  const user_data = {
+    user: {
+      id: id,
+      name: data,
+      points: 0,
+    },
+  };
+  variables.users.push(user_data);
+  return user_data;
+}

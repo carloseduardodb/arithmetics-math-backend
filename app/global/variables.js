@@ -1,5 +1,5 @@
-export let games = [];
+exports.games = [];
 
-export let rooms = [];
+exports.rooms = [];
 
-export let users = [];
+exports.users = [];
