@@ -81,9 +81,14 @@ io.on("connection", (socket) => {
           games.map((game) => {
             if (game.room_id === room.id) {
               if (game.remaining_matches == 1) {
-                //disparar evento para finalizar o jogo se o dono da sala ganhar
-                io.to(room.room_owner).emit("status", { game: "win" });
-                io.to(room.room_client).emit("status", { game: "loser" });
+                //disparar evento para finalizar o jogo se o dono da sala ganhar ou o client
+                if (game.point_owner > game.point_client) {
+                  io.to(room.room_owner).emit("status", { game: "win" });
+                  io.to(room.room_client).emit("status", { game: "loser" });
+                } else {
+                  io.to(room.room_owner).emit("status", { game: "loser" });
+                  io.to(room.room_client).emit("status", { game: "win" });
+                }
               }
               const generate = generateCalculation();
               game.first_value = generate.first_value;
@@ -100,9 +105,14 @@ io.on("connection", (socket) => {
           games.map((game) => {
             if (game.room_id === room.id) {
               if (game.remaining_matches == 1) {
-                //disparar evento para finalizar o jogo
-                io.to(room.room_owner).emit("status", { game: "loser" });
-                io.to(room.room_client).emit("status", { game: "win" });
+                //disparar evento para finalizar o jogo se o dono da sala ganhar ou o client
+                if (game.point_owner > game.point_client) {
+                  io.to(room.room_owner).emit("status", { game: "win" });
+                  io.to(room.room_client).emit("status", { game: "loser" });
+                } else {
+                  io.to(room.room_owner).emit("status", { game: "loser" });
+                  io.to(room.room_client).emit("status", { game: "win" });
+                }
               }
               const generate = generateCalculation();
               game.first_value = generate.first_value;
@@ -116,10 +126,6 @@ io.on("connection", (socket) => {
           });
         }
       });
-
-      //envia para o dono da sala e para o adversário o estado do jogo
-      //io.to(roomIndex.room_owner).emit("game", games);
-      //io.to(socket.id).emit("game", games);
     }
   });
 
