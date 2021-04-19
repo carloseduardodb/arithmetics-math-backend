@@ -2,19 +2,22 @@ const express = require("express");
 let game_functions = require("./app/logic/games");
 let room_functions = require("./app/logic/rooms");
 let variables = require("./app/global/variables");
+const socketIO = require("socket.io");
 
-const app = express();
-const server = require("https").createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
+const PORT = process.env.PORT || 3001;
+const INDEX = "/index.html";
+
+const server = express()
+  .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const io = socketIO(server);
 
 io.on("connection", (socket) => {
-  //Fala pra todo mundo as salas que existem
-  socket.emit("rooms", variables.rooms);
+  socket.on("getRooms", () => {
+    //Fala pra todo mundo as salas que existem
+    socket.emit("rooms", variables.rooms);
+  });
 
   //recebe uma nova sala criada
   socket.on(`sendRoom`, (data) => {
@@ -137,6 +140,8 @@ io.on("connection", (socket) => {
     }
     socket.emit("battle", variables.battles);
   });
+
+  socket.on("disconnect", () => console.log("Client disconnected"));
 });
 
-server.listen(3001);
+setInterval(() => io.emit("time", new Date().toTimeString()), 1000);

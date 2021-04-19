@@ -8,9 +8,6 @@
     "socket.io": "^4.0.1"
   },
   "scripts": {
-    "start": "node server.js",
-    "build": "node server.js",
-    "test": "node server.js",
-    "eject": "node server.js"
+    "start": "node server.js"
   }
 }
