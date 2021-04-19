@@ -83,18 +83,35 @@ exports.generateNewRound = (game, room, io, owner) => {
 
 /** cria uma nova batalha */
 
-exports.createBattle = (data, socket) => {
-  const battle = {
+exports.createUser = (data, socket) => {
+  const user = {
     user: {
       id_client: socket.id,
       name: data.name,
       points: 0,
     },
+  };
+  if (variables.battles.length === 0) {
+    this.updateBattle(socket);
+  }
+  let status;
+  variables.users.map((unique_user) => {
+    if (unique_user.user.id_client === socket.id) {
+      status = true;
+      return unique_user;
+    }
+  });
+  !status ? variables.users.push(user) : "";
+  return user;
+};
+
+exports.updateBattle = (socket) => {
+  const data = this.generateCalculation();
+  const battles = {
     operator: data.operator,
     first_value: data.first_value,
     last_value: data.last_value,
   };
-  console.log(battle);
-  variables.battles.push(battle);
-  return battle;
+  variables.battles = battles;
+  socket.broadcast.emit("battles", battles);
 };

@@ -2,6 +2,9 @@ const express = require("express");
 let game_functions = require("./app/logic/games");
 let room_functions = require("./app/logic/rooms");
 let variables = require("./app/global/variables");
+var cluster = require("cluster");
+var http = require("http");
+var numCPUs = require("os").cpus().length;
 
 const app = express();
 const server = require("http").createServer(app);
@@ -90,8 +93,18 @@ io.on("connection", (socket) => {
   });
 
   //recebe a batalha
+  socket.on("createUser", (data) => {
+    game_functions.createUser(data, socket);
+    const battle_name = "battle-" + socket.id;
+    io.to(socket.id).emit(battle_name, { status: true });
+    socket.emit("battles", variables.battles);
+  });
+
+  //recebe a batalha
   socket.on("createBattle", (data) => {
     game_functions.createBattle(data, socket);
+    const battle_name = "battle-" + socket.id;
+    io.to(socket.id).emit(battle_name, { status: true });
     socket.emit("battles", variables.battles);
   });
 
