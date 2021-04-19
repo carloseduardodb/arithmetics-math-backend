@@ -2,9 +2,6 @@ const express = require("express");
 let game_functions = require("./app/logic/games");
 let room_functions = require("./app/logic/rooms");
 let variables = require("./app/global/variables");
-var cluster = require("cluster");
-var http = require("http");
-var numCPUs = require("os").cpus().length;
 
 const app = express();
 const server = require("http").createServer(app);
@@ -65,7 +62,6 @@ io.on("connection", (socket) => {
     );
 
     if (data.response == hidratedDataResult) {
-      console.log(hidratedDataResult);
       //achando o usuário e mudando seu numero de pontos
       variables.rooms.map((room) => {
         if (room.room_owner === socket.id) {
@@ -108,6 +104,21 @@ io.on("connection", (socket) => {
     socket.emit("battles", variables.battles);
   });
 
+  socket.on("getBattle", () => {
+    socket.emit("battle", variables.battles);
+  });
+
+  socket.on("getRanking", () => {
+    let ranking = [];
+    variables.users.map((unique_user) => {
+      ranking.push({
+        name: unique_user.user.name,
+        points: unique_user.user.points,
+      });
+    });
+    socket.emit("ranking", ranking);
+  });
+
   //recebe a batalha
   socket.on("playBattle", (data) => {
     const hidratedDataResult = game_functions.hidratedResult(
@@ -116,13 +127,14 @@ io.on("connection", (socket) => {
       data.calcType
     );
     if (data.response == hidratedDataResult) {
-      variables.battles.map((battle) => {
-        if (battle.user.id_client === socket.id) {
-          battle.user.points++;
+      variables.users.map((unique_user) => {
+        if (unique_user.user.id_client === socket.id) {
+          unique_user.user.points++;
+          game_functions.updateBattle(socket);
         }
       });
     }
-    socket.emit("battles", variables.battles);
+    socket.emit("battle", variables.battles);
   });
 });
 

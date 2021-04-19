@@ -12,7 +12,6 @@ exports.createGame = (data) => {
     point_client: data.point_client,
     point_owner: data.point_owner,
   };
-  console.log(game);
   variables.games.push(game);
   return game;
 };
@@ -81,8 +80,7 @@ exports.generateNewRound = (game, room, io, owner) => {
   io.to(room.room_client).emit("game", game);
 };
 
-/** cria uma nova batalha */
-
+/**Cria um novo usuário e inicia uma batalha se não existir */
 exports.createUser = (data, socket) => {
   const user = {
     user: {
@@ -91,9 +89,9 @@ exports.createUser = (data, socket) => {
       points: 0,
     },
   };
-  if (variables.battles.length === 0) {
-    this.updateBattle(socket);
-  }
+
+  variables.battles.length === 0 && this.updateBattle(socket);
+
   let status;
   variables.users.map((unique_user) => {
     if (unique_user.user.id_client === socket.id) {
@@ -105,6 +103,7 @@ exports.createUser = (data, socket) => {
   return user;
 };
 
+/**atualiza as contas da batalha */
 exports.updateBattle = (socket) => {
   const data = this.generateCalculation();
   const battles = {
@@ -113,5 +112,5 @@ exports.updateBattle = (socket) => {
     last_value: data.last_value,
   };
   variables.battles = battles;
-  socket.broadcast.emit("battles", battles);
+  socket.broadcast.emit("battle", battles);
 };
