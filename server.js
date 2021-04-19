@@ -4,7 +4,7 @@ let room_functions = require("./app/logic/rooms");
 let variables = require("./app/global/variables");
 const socketIO = require("socket.io");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const INDEX = "/index.html";
 
 const server = express()
