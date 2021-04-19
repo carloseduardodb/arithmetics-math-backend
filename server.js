@@ -4,10 +4,10 @@ let room_functions = require("./app/logic/rooms");
 let variables = require("./app/global/variables");
 
 const app = express();
-const server = require("http").createServer(app);
+const server = require("https").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
