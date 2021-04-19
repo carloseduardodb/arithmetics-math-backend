@@ -80,3 +80,21 @@ exports.generateNewRound = (game, room, io, owner) => {
   io.to(room.room_owner).emit("game", game);
   io.to(room.room_client).emit("game", game);
 };
+
+/** cria uma nova batalha */
+
+exports.createBattle = (data, socket) => {
+  const battle = {
+    user: {
+      id_client: socket.id,
+      name: data.name,
+      points: 0,
+    },
+    operator: data.operator,
+    first_value: data.first_value,
+    last_value: data.last_value,
+  };
+  console.log(battle);
+  variables.battles.push(battle);
+  return battle;
+};

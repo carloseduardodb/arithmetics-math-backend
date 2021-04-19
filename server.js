@@ -1,7 +1,6 @@
 const express = require("express");
 let game_functions = require("./app/logic/games");
 let room_functions = require("./app/logic/rooms");
-let user_functions = require("./app/logic/user");
 let variables = require("./app/global/variables");
 
 const app = express();
@@ -90,12 +89,27 @@ io.on("connection", (socket) => {
     }
   });
 
-  //recebe o nome do usuário e os pontos
-  socket.on("sendUser", (data) => {
-    const user = user_functions.createUser(data.name, socket.id);
-    userStatus = true;
-    io.to(socket.id).emit("user_status", { status: true });
-    io.to(socket.id).emit("user", user);
+  //recebe a batalha
+  socket.on("createBattle", (data) => {
+    game_functions.createBattle(data, socket);
+    socket.emit("battles", variables.battles);
+  });
+
+  //recebe a batalha
+  socket.on("playBattle", (data) => {
+    const hidratedDataResult = game_functions.hidratedResult(
+      data.first_value,
+      data.last_value,
+      data.calcType
+    );
+    if (data.response == hidratedDataResult) {
+      variables.battles.map((battle) => {
+        if (battle.user.id_client === socket.id) {
+          battle.user.points++;
+        }
+      });
+    }
+    socket.emit("battles", variables.battles);
   });
 });
 
